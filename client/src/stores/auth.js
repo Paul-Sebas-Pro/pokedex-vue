@@ -3,7 +3,7 @@ import { ref, computed } from "vue";
 
 export const useAuthStore = defineStore("auth", () => {
     // --- STATE ---
-    const token = ref(localStorage.getItem("token") || null); // Récupère le token depuis le localStorage s'il existe
+    const token = ref(localStorage.getItem("token") || null);             // Récupère le token depuis le localStorage s'il existe
     const user = ref(JSON.parse(localStorage.getItem("user")) || null);   // Récupère les infos utilisateur depuis le localStorage s'il existe
 
     // --- GETTERS --- (Comme des $derived en Svelte 5)
