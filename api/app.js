@@ -11,6 +11,7 @@ import { authRouter } from "./routers/auth.router.js";
 // Importation et configuration de Swagger
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpecification } from "./swagger.config.js";
+import { sequelize } from "./models/sequelize.client.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,7 +20,10 @@ const __dirname = path.dirname(__filename);
 const PORT = process.env.PORT || 3000;
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+  credentials: true
+}));
 app.use(express.json());
 
 // Documentation Swagger disponible à l'URL /api-docs
@@ -47,12 +51,19 @@ app.get("/", (req, res) => {
   res.send("Bienvenue dans l'API du Pokédex !");
 });
 
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "OK",
+    message: "L'API fonctionne correctement.",
+    database: sequelize.authenticate() ? "Connectée" : "Non connectée"
+  });
+});
+
 /* === LES ROUTES === */
 app.use("/api", teamsRouter);
 app.use("/api", pokemonsRouter);
 app.use("/api", typesRouter);
 app.use("/api", authRouter);
-
 
 // Démarrer le serveur
 app.listen(PORT, () => {

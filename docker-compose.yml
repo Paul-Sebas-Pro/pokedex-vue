@@ -1,0 +1,92 @@
+services:
+  # Base de données PostgreSQL
+  db:
+    image: postgres:18-alpine
+    container_name: pokedex_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pokedex
+      POSTGRES_PASSWORD: pokedex972
+      POSTGRES_DB: pokedex_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - pokedex_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pokedex -d pokedex_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Express
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.dev
+    container_name: pokedex_api
+    restart: unless-stopped
+    env_file:
+      - ./api/.env
+    environment:
+      NODE_ENV: development
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: pokedex_db
+      DB_USER: pokedex
+      DB_PASSWORD: pokedex972
+      PORT: 3000
+      JWT_SECRET: Ceci_Est_Ma_Clef_JWT_Ultra_Secrete_12345
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./api:/app
+      - /app/node_modules # Évite de monter node_modules du host
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - pokedex_network
+    command: sh -c "sleep 5 && npm run dev"
+
+  # Frontend Vite
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    container_name: pokedex_client
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:3000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - api
+    networks:
+      - pokedex_network
+    command: npm run dev -- --host
+
+  # Adminer pour gérer la base de données (optionnel)
+  adminer:
+    image: adminer:latest
+    container_name: pokedex_adminer
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db
+    networks:
+      - pokedex_network
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+
+networks:
+  pokedex_network:
+    driver: bridge
+
+volumes:
+  postgres_data:

@@ -1,6 +1,6 @@
 import { User } from "../models/index.js";
 import { StatusCodes } from "http-status-codes";
-import argon2 from "argon2";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const authController = {
@@ -35,11 +35,12 @@ export const authController = {
             if (existingUser) {
                 return res
                     .status(StatusCodes.CONFLICT)
-                    .json({ error: "Cet email est déja utilisé" });
+                    .json({ error: "Cet email est déjà utilisé" });
             }
 
-            // Hasher le mot de passe avec Argon2 avant de le stocker
-            const hashedPassword = await argon2.hash(password);
+            // Hasher le mot de passe avec bcrypt avant de le stocker
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
 
             // Créer le nouvel utilisateur dans la base de données
             const newUser = await User.create({
@@ -88,8 +89,8 @@ export const authController = {
                     .json({ error: "Email ou mot de passe incorrect" });
             }
 
-            // Vérifier le mot de passe avec Argon2
-            const isPasswordValid = await argon2.verify(user.password, password);
+            // Vérifier le mot de passe avec bcrypt
+            const isPasswordValid = await bcrypt.compare(password, user.password);
             if (!isPasswordValid) {
                 return res
                     .status(StatusCodes.UNAUTHORIZED)

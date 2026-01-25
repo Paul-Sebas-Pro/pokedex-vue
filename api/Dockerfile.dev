@@ -1,0 +1,24 @@
+# api/Dockerfile.dev
+FROM node:25-alpine
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Installer les dépendances système nécessaires
+RUN apk add --no-cache python3 make g++
+
+
+# Copier les fichiers de dépendances
+COPY package*.json ./
+
+# Installer les dépendances
+RUN npm install
+
+# Copier le code source
+COPY . .
+
+# Exposer le port de l'application
+EXPOSE 3000
+
+# Commande par défaut (sera surchargée par docker-compose)
+CMD ["npm", "run", "dev"]
