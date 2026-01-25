@@ -1,0 +1,21 @@
+@baseUrl = http://localhost:3000/api
+
+### Test 1 : User Sign Up
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "pseudo": "SachaDuBourgPalette",
+  "email": "sacha@pokedex.com",
+  "password": "Passw0rd",
+  "passwordConfirm": "Passw0rd"
+}
+
+### Test 2 : User Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "sacha@pokedex.com",
+  "password": "Passw0rd"
+}

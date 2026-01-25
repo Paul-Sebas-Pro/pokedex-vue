@@ -10,7 +10,7 @@ const error = ref(null);
 // onMounted est l'équivalent de onMount en Svelte
 onMounted(async () => {
   try {
-    const response = await api.get("/pokemons");
+    const response = await api.get("api/pokemons");
     pokemons.value = response.data;
   } catch (err) {
     error.value = "Impossible de charger les Pokémons.";

@@ -13,11 +13,11 @@ const error = ref(null);
 const isLoading = ref(false);
 
 const handleLogin = async () => {
-  isLoading.ref = true;
+  isLoading.value = true;
   error.value = null;
 
   try {
-    const response = await api.post("/login", {
+    const response = await api.post("api/auth/login", {
       email: email.value,
       password: password.value,
     });
@@ -74,7 +74,7 @@ const handleLogin = async () => {
         :disabled="isLoading"
         class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-blue-300"
       >
-        {{ isLoading ? "Connexion" : "Se connecter" }}
+        {{ isLoading ? "Connexion..." : "Se connecter" }}
       </button>
     </form>
   </div>
