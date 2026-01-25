@@ -1,0 +1,45 @@
+// HTTP requests for testing the teams endpoints
+
+@baseUrl = http://localhost:3000/api
+
+### Test 1 : Get all teams
+GET {{baseUrl}}/teams
+
+### Test 2 : Get one team by ID
+GET {{baseUrl}}/teams/5
+
+### Test 3 : Create a new team
+POST {{baseUrl}}/teams
+Content-Type: application/json
+
+{
+  "name": "Team Rocket",
+  "description": "La team Rocket s'en va vers d'autres cieux !!!!"
+}
+
+### Test 4 : Update an existing team
+PATCH {{baseUrl}}/teams/4
+Content-Type: application/json
+
+{
+  "name": "Team Rocket",
+  "description": "La team Rocket s'en va vers d'autres cieuuuuuuxxxxx !!!!"
+}
+
+### Test 5 : Add a Pokémon to a team 
+### team with ID 5 => Team Rocket
+### pokemon with ID 25 => Pikachu
+POST {{baseUrl}}/teams/5/pokemons
+Content-Type: application/json
+
+{
+  "pokemonId": 25
+}
+
+### Test 6 : Remove a Pokémon from a team
+### team with ID 4 => Team Rocket
+### pokemon with ID 25 => Pikachu
+DELETE {{baseUrl}}/teams/4/pokemons/25
+
+### Test 7 : Delete a team
+DELETE {{baseUrl}}/teams/5

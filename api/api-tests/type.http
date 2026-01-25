@@ -1,0 +1,9 @@
+// HTTP requests for testing the types endpoints
+
+@baseUrl = http://localhost:3000/api
+
+### Test 1 : Get all Types
+GET {{baseUrl}}/types
+
+### Test 2 : Get all Pokémons by Type ID
+GET {{baseUrl}}/types/5/pokemons

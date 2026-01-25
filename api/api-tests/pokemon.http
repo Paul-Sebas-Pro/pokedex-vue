@@ -1,0 +1,9 @@
+// HTTP requests for testing the pokémons endpoints
+
+@baseUrl = http://localhost:3000/api
+
+### Test 1 : Get all Pokémons
+GET {{baseUrl}}/pokemons
+
+### Test 2 : Get one Pokémon by ID
+GET {{baseUrl}}/pokemons/25

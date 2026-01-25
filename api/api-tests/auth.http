@@ -1,0 +1,54 @@
+// HTTP requests for authentication endpoints
+
+@baseUrl = http://localhost:3000/api
+
+### Test 1 : User Sign Up
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "pseudo": "SachaDuBourgPalette",
+  "email": "sacha@pokedex.com",
+  "password": "MonSuperMotDePasse123!",
+  "passwordConfirm": "MonSuperMotDePasse123!"
+}
+
+### Test 2 : User Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "sacha@pokedex.com",
+  "password": "MonSuperMotDePasse123!"
+}
+
+### Test 3 : Create an other user (other token for further tests)
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "pseudo": "MistyWaterflower",
+  "email": "misty@pokedex.com",
+  "password": "MonSuperMotDePasse456!",
+  "passwordConfirm": "MonSuperMotDePasse456!"
+}
+
+### Test 4 : User Login for the other user
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "misty@pokedex.com",
+  "password": "MonSuperMotDePasse456!"
+}
+
+### Test 5 - VALIDATION : User Sign Up with invalid data (missing fields) - FAIL
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "pseudo": "",
+  "email": "invalid-email",
+  "password": "short",
+  "passwordConfirm": "different"
+}

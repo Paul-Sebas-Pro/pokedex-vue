@@ -1,0 +1,161 @@
+// HTTP requests for testing the teams endpoints without and with authentication
+
+@baseUrl = http://localhost:3000/api
+
+### Login User 1 (Sacha) - Get JWT Token
+# @name loginUser1
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "sacha@pokedex.com",
+  "password": "password123"
+}
+
+### Login User 2 (Misty) - Get JWT Token
+# @name loginUser2
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "misty@pokedex.com",
+  "password": "password123"
+}
+
+###
+@tokenUser1 = {{loginUser1.response.body.token}}
+@tokenUser2 = {{loginUser2.response.body.token}}
+
+### Test 1 : Get all teams (public route) - SUCCESS
+GET {{baseUrl}}/teams
+
+### Test 2 : Get one team by ID (public route) - SUCCESS
+GET {{baseUrl}}/teams/1
+
+### Test 3 : Create a new team (protected route) without authentification - FAIL
+POST {{baseUrl}}/teams
+Content-Type: application/json
+
+{
+  "name": "Team Rocket 3",
+  "description": "La team Rocket s'en va vers d'autres cieux !!!!"
+}
+
+### Test 4 : Create a new team (protected route) with authentification - SUCCESS
+POST {{baseUrl}}/teams
+Content-Type: application/json
+Authorization: Bearer {{tokenUser1}}
+
+{
+  "name": "Team Rocket 4",
+  "description": "La team Rocket s'en va vers d'autres cieux !!!!"
+}
+
+### Test 5 : Update an existing team (protected route) without authentification - FAIL
+PATCH {{baseUrl}}/teams/7
+Content-Type: application/json
+
+{
+  "name": "Team Rocket Updated",
+  "description": "La team Rocket s'en va vers d'autres cieuuuuuuxxxxx !!!!"
+}
+
+### Test 6 : Update an existing team (protected route) with authentification - SUCCESS
+PATCH {{baseUrl}}/teams/13
+Content-Type: application/json
+Authorization: Bearer {{tokenUser1}}
+
+{
+  "name": "New Team Rocket Updated",
+  "description": "La team Rocket s'en va vers d'autres cieuuuuuuxxxxx !!!!"
+}
+
+### Test 7 - USER RIGHTS
+### Create a new team by associating the team with the user
+POST {{baseUrl}}/teams
+Content-Type: application/json
+Authorization: Bearer {{tokenUser1}}
+
+{
+  "name": "Team Mystic",
+  "description": "La team Mystic est la meilleure équipe de Pokémon GO !"
+}
+
+### Test 8 - Create a new team with another user
+POST {{baseUrl}}/teams
+Content-Type: application/json
+Authorization: Bearer {{tokenUser2}}
+
+{
+  "name": "Team Valor",
+  "description": "La team Valor est la spécialiste des combats Pokémon !"
+}
+
+### Test 9 - Attempt to delete the first team (created by user 1) with the second user - FAIL
+DELETE {{baseUrl}}/teams/9
+Authorization: Bearer {{tokenUser2}}
+
+### Test 10 - Update the first team (created by user 1) with the second user - FAIL
+PATCH {{baseUrl}}/teams/9
+Content-Type: application/json
+Authorization: Bearer {{tokenUser2}}
+
+{
+  "name": "Team Mystic Updated by Misty",
+  "description": "La team Mystic est la meilleure équipe de Pokémon GO ! (modifiée par Misty)"
+}
+
+### Test 11 - Update the first team (created by user 1) with the first user - SUCCESS
+PATCH {{baseUrl}}/teams/9
+Content-Type: application/json
+Authorization: Bearer {{tokenUser1}}
+
+{
+  "name": "Team Mystic Updated by Sacha",
+  "description": "La team Mystic est la meilleure équipe de Pokémon GO ! (modifiée par Sacha)"
+}
+
+### Test 12 - Add a Pokémon to the first team (created by user 1) with the second user - FAIL
+POST {{baseUrl}}/teams/9/pokemons
+Content-Type: application/json
+Authorization: Bearer {{tokenUser2}}
+
+{
+  "pokemonId": 25
+}
+
+### Test 13 - Add a Pokémon to the first team (created by user 1) with the first user - SUCCESS
+POST {{baseUrl}}/teams/13/pokemons
+Content-Type: application/json
+Authorization: Bearer {{tokenUser1}}
+
+{
+  "pokemonId": 25
+}
+
+### Test 14 - Remove a Pokémon from the first team (created by user 1) with the second user - FAIL
+DELETE {{baseUrl}}/teams/9/pokemons/25
+Authorization: Bearer {{tokenUser2}}
+
+### Test 15 - Remove a Pokémon from the first team (created by user 1) with the first user - SUCCESS
+DELETE {{baseUrl}}/teams/9/pokemons/25
+Authorization: Bearer {{tokenUser1}}
+
+### Test 16 VALIDATION : Create a new team with invalid data (missing fields) - FAIL
+POST {{baseUrl}}/teams
+Content-Type: application/json
+Authorization: Bearer {{tokenUser2}}
+{
+  "name": "",
+  "description": "AZERTY"
+}
+
+### Test 17 VALIDATION : Update a team with invalid data (missing fields) - FAIL
+PATCH {{baseUrl}}/teams/7
+Content-Type: application/json
+Authorization: Bearer {{tokenUser1}}
+
+{
+  "name": "",
+  "description": "Short"
+}
