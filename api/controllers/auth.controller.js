@@ -38,6 +38,13 @@ export const authController = {
                     .json({ error: "Cet email est déjà utilisé" });
             }
 
+            // Vérifier que le mot de passe ne sera pas tronqué (limite de 72 bytes)
+            if (bcrypt.truncates(password)) {
+                return res
+                    .status(StatusCodes.BAD_REQUEST)
+                    .json({ error: "Le mot de passe est trop long (maximum 72 bytes)" });
+            }
+
             // Hasher le mot de passe avec bcrypt avant de le stocker
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
@@ -119,6 +126,7 @@ export const authController = {
             });
         
         } catch (error) {
+            console.error("Erreur lors de la connexion :", error);
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Une erreur est survenue lors de la connexion" });
         }
     }
